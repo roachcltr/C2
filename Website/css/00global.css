@@ -1,0 +1,28 @@
+:root {
+  --strokeorborder : rgba(74, 222, 128, 1);
+  --black : rgba(10, 13, 18, 0.6);
+  --hover : rgba(74, 222, 128, 0.15); 
+  --glow : rgba(74, 222, 128, 0.5);
+  --panel : rgba(74, 222, 128, 0.3);
+  --header : rgba(74, 222, 128, 0.05);
+
+  --color-rings : rgba(74, 222, 128, 1); /* Tactical Green */
+  --color-azimuth : rgba(255, 255, 255, 1); /* White */
+  --color-grid : rgba(255, 255, 255, 1); /* Faint Blue */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0a0d12;
+  font-family: 'Segoe UI', monospace;
+}
+
+#cesium-container {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

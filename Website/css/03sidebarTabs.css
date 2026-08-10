@@ -1,0 +1,68 @@
+/* =========================================
+   VERTICAL TABS (Restaurant Menu Style)
+   ========================================= */
+.sidebar-tabs-vertical {
+  position: absolute;
+  top: -1px; /* Positioned below the compass */
+  right: -60px; /* Hangs seamlessly off the right edge */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tab-btn {
+  width: 56px;
+  height: 116px;
+  background: var(--black);
+  border: 1px solid var(--strokeorborder);
+  border-left: none; /* Blends into the sidebar body */
+  border-radius: 0 6px 6px 0;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+}
+
+.tab-btn.about {
+  width: 56px;
+  height: 66px;
+  background: var(--black);
+  border: 1px solid var(--strokeorborder);
+  border-left: none; /* Blends into the sidebar body */
+  border-radius: 0 6px 6px 0;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: var(--hover);
+  color: var(--strokeorborder);
+}
+
+.tab-btn.active {
+  background: var(--panel);
+  color: var(--strokeorborder);
+  box-shadow: 2px 0 10px var(--glow);
+  width: 60px; /* Pops out slightly when active */
+  right: -46px;
+}
+
+.tab-btn.collapsed {
+  background: var(--black);
+  color: var(--strokeorborder);
+  width: 56px;
+  right: -56px;
+}
+
+/* Used by tabIndex.js to hide inactive panels */
+.sidebar-section.hidden {
+  display: none !important;
+}

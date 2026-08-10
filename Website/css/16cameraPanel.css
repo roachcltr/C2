@@ -1,0 +1,390 @@
+/* =========================================
+   16. CAMERA PANEL & HUD STYLES
+   ========================================= */
+
+/* Kembalikan lebar standar, biarkan panel MEMANJANG KE BAWAH */
+#right-camera-panel {
+  width: 480px !important;
+  height: auto !important; /* Rahasia agar panel turun mengisi space kosong */
+  max-height: 96vh !important; /* Batas aman agar tidak tembus layar monitor */
+}
+
+.camera-body-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: auto; 
+  width: 100%;
+  overflow: hidden; 
+  background: #0a0d12;
+}
+
+/* Video mengambil rasio murni dari backend */
+.video-wrapper {
+  width: 100%;
+  height: auto; 
+  background: #000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid var(--panel);
+}
+
+#optronic-stream {
+  width: 100%;
+  height: auto; /* Tinggi otomatis menjaga rasio asli kamera */
+  object-fit: contain; /* Tidak ada zoom/potong paksa */
+  display: block;
+  /* transform: rotate(180deg); */
+}
+
+/* Panel Kontrol di Bawah */
+.hud-overlay {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Lebih rapat */
+  flex-shrink: 0; /* Jangan sampai tombol ikut mengecil */
+  pointer-events: none;
+}
+
+.hud-compact-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Kelompok Tombol Umum */
+.hud-group {  
+  display: flex; 
+  align-items: center;
+  gap: 6px; 
+  background: rgba(10, 13, 18, 0.8);
+  padding: 4px 8px; /* Dibuat lebih pipih */
+  border-radius: 6px; 
+  border: 1px solid rgba(255,255,255,0.1);
+  pointer-events: auto; /* Memastikan bisa diklik */
+  backdrop-filter: blur(2px);
+}
+
+.hud-group .divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.2);
+  margin: 0 4px;
+}
+
+.hud-btn {
+  background: transparent; border: 1px solid transparent; color: #8ba2b5;
+  font-size: 10px; font-family: 'Segoe UI', monospace; font-weight: bold;
+  padding: 4px 8px; /* Dibuat lebih pipih */
+  border-radius: 4px; cursor: pointer; transition: 0.15s;
+}
+
+.hud-btn:hover { background: rgba(255,255,255,0.1); color: var(--strokeorborder); border: 1px solid var(--strokeorborder); }
+.hud-btn:active { background: var(--strokeorborder); color: #000; transform: scale(0.95); }
+.hud-btn.danger:hover { border-color: #ef4444; color: #ef4444; }
+.hud-btn.danger:active { background: #ef4444; color: #fff; }
+
+/* Pointing Group (Compass + D-Pad) */
+.pointing-group {
+  display: flex; gap: 15px; align-items: center;
+  background: rgba(10, 13, 18, 0.8); padding: 8px 12px;
+  border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+  pointer-events: auto; backdrop-filter: blur(2px);
+}
+
+/* Mini Compass (Menggunakan class aslinya agar JS tidak error) */
+.compass-container {
+  position: relative; width: 60px; height: 60px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 25, 40, 0.8) 0%, rgba(5, 7, 10, 1) 100%);
+  border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+.compass-value {
+  position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px;
+  color: var(--strokeorborder); font-size: 9px; font-family: monospace; font-weight: bold;
+  border: 1px solid rgba(255,255,255,0.2); text-shadow: 0 0 3px var(--strokeorborder);
+}
+
+/* Mini D-Pad */
+.mini-dpad { display: grid; grid-template-columns: repeat(3, 26px); gap: 4px; }
+.dpad-btn {
+  width: 26px; height: 26px; background: rgba(20, 26, 35, 0.8);
+  border: 1px solid rgba(255,255,255,0.1); color: #8ba2b5; border-radius: 4px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.dpad-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.dpad-btn:active { background: var(--strokeorborder); color: #000; transform: scale(0.95); }
+/* Menghilangkan warna hijau pada tombol center dan membuatnya netral */
+.dpad-btn.center { 
+  border-color: rgba(255,255,255,0.1); 
+  color: #8ba2b5; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 0; 
+}
+.dpad-btn.center:active { 
+  background: #fff; 
+  color: #000; 
+}
+
+/* Zoom Controls Horizontal & Label Badge Cantik */
+.mini-zoom-control { display: flex; align-items: center; gap: 8px; width: 100%; }
+
+.zoom-lbl { 
+  font-size: 9px; 
+  font-family: 'JetBrains Mono', monospace; 
+  color: #000; 
+  font-weight: 800; 
+  width: 24px; 
+  text-align: center;
+  padding: 3px 0;
+  border-radius: 3px;
+}
+.zoom-lbl.vl { background: #4ade80; }
+.zoom-lbl.ir { background: #38bdf8; }
+.z-btn {
+  width: 22px; height: 22px; background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; border-radius: 4px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; line-height: 1; transition: 0.2s;
+}
+.z-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+.z-btn:active { background: #fff; color: #000; transform: scale(0.95); }
+
+/* Custom Sliders */
+.styled-slider { -webkit-appearance: none; appearance: none; width: 100%; background: transparent; height: 4px; outline: none; }
+.styled-slider::-webkit-slider-runnable-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; }
+.styled-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; height: 14px; width: 14px; border-radius: 50%;
+  cursor: pointer; margin-top: -5px; box-shadow: 0 0 5px rgba(0,0,0,0.8);
+}
+.slider-vl::-webkit-slider-thumb { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+.slider-ir::-webkit-slider-thumb { background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+
+/* =========================================
+   Zoom Value Display (Stepper Mode)
+   ========================================= */
+.zoom-value {
+  flex: 1; /* Otomatis mengisi ruang kosong di tengah */
+  text-align: center;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 3px 0;
+  letter-spacing: 0.5px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+  transition: color 0.2s;
+}
+
+/* =========================================
+   Mode Fullscreen (Maximized - Native)
+   ========================================= */
+#right-camera-panel.maximized {
+  background: #000; /* Layar belakang menjadi hitam pekat */
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+/* Sembunyikan header panel (tulisan OPTRONIC CAMERA & tombol silang) agar murni video */
+#right-camera-panel.maximized .camera-panel-header {
+  display: none !important;
+}
+
+#right-camera-panel.maximized .camera-body-wrapper { 
+  height: 100% !important;
+  overflow: hidden; 
+}
+
+#right-camera-panel.maximized .video-wrapper {
+  height: 100% !important; /* Paksa wadah video membentang penuh atas-bawah */
+}
+
+/* OVERLAY BOX FULLSCREEN */
+#right-camera-panel.maximized .hud-overlay {
+  position: absolute; 
+  bottom: 20px; /* Jarak aman diatur dari bottom, bukan padding */
+  left: 0; 
+  width: 100%; 
+  height: auto; 
+  background: transparent; 
+  border: none;
+  padding: 0; /* Padding di-nol-kan agar rata tengah bekerja 100% akurat */
+  z-index: 10;
+  pointer-events: none; /* Klik tembus ke video, kecuali pas di tombol */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  justify-content: center;
+}
+
+/* Kembalikan kemampuan klik khusus untuk baris kontrol */
+#right-camera-panel.maximized .hud-compact-row {
+  pointer-events: auto;
+}
+
+/* Animasi collapsed bersembunyi ke bawah layar */
+#right-camera-panel.maximized .hud-overlay.collapsed {
+  transform: translateY(calc(100% + 20px)); /* Sembunyi sampai bawah + jarak 20px */
+}
+
+/* TAB TOGGLE EXPAND/COLLAPSE */
+.fs-hud-toggle { display: none; }
+#right-camera-panel.maximized .fs-hud-toggle {
+  display: flex;
+  position: absolute;
+  top: -23px; /* Ditempelkan pas ke border atas box (mengeliminasi gap) */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  height: 24px;
+  background: rgba(10, 13, 18, 0.35); /* Transparansi disamakan (0.35) */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: none; /* Garis bawah dihapus agar menyatu seperti tab */
+  border-radius: 8px 8px 0 0;
+  align-items: center;
+  justify-content: center;
+  color: #8ba2b5;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+#right-camera-panel.maximized .fs-hud-toggle:hover { color: #4ade80; }
+#right-camera-panel.maximized .hud-overlay.collapsed .fs-hud-toggle svg { transform: rotate(180deg); }
+
+/* === RE-LAYOUT KHUSUS FULLSCREEN (Satu Box Panjang) === */
+#right-camera-panel.maximized .hud-compact-row {
+  flex-direction: row !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  gap: 0 !important; 
+  background: rgba(10, 13, 18, 0.35) !important; /* LEBIH TRANSPARAN (0.35) */
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 8px !important;
+  padding: 0 !important;
+  width: max-content !important;
+  max-width: 98vw !important; /* Mencegah melebar hingga keluar layar */
+  margin: 0 auto !important; /* PAKSA RATA TENGAH SEMPURNA */
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Blok Kiri (Sensor, Optik, Media) */
+#right-camera-panel.maximized .hud-left-block {
+  flex-direction: row !important;
+  flex-wrap: nowrap !important; /* Paksa sebaris agar tidak turun */
+  justify-content: center !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+}
+
+/* Hapus background 6 box, jadikan tembus pandang dan beri garis vertikal */
+#right-camera-panel.maximized .hud-left-block .hud-group,
+#right-camera-panel.maximized .pointing-group {
+  background: transparent !important;
+  border: none !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important; /* Garis pemisah */
+  border-radius: 0 !important;
+  padding: 8px 12px !important;
+  justify-content: center !important;
+}
+
+/* Blok Kanan (D-Pad, Zoom, Patrol) */
+#right-camera-panel.maximized .pointing-group {
+  border-right: none !important; /* Ujung kanan hilangkan garis */
+  flex-direction: row !important;
+  gap: 15px !important;
+  align-items: center !important;
+  min-width: auto !important;
+}
+
+/* Hilangkan margin/padding sisa div di dalam pointing-group */
+#right-camera-panel.maximized .pointing-group > div {
+  width: auto !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Mengecilkan D-Pad */
+#right-camera-panel.maximized .mini-dpad {
+  grid-template-columns: repeat(3, 22px) !important;
+  gap: 2px !important;
+}
+#right-camera-panel.maximized .dpad-btn {
+  width: 22px !important;
+  height: 22px !important;
+}
+#right-camera-panel.maximized .dpad-btn svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* Mengecilkan Tombol Zoom Khusus Fullscreen */
+#right-camera-panel.maximized .mini-zoom-control .hud-btn {
+  width: 22px !important;
+  height: 22px !important;
+  padding: 0 !important;
+}
+#right-camera-panel.maximized .mini-zoom-control .hud-btn svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+/* Fix Auto Patrol kepotong */
+#right-camera-panel.maximized .pointing-group .opt-toggle {
+  white-space: nowrap !important;
+  padding: 6px 14px !important;
+}
+
+/* Munculkan tooltip hanya saat area slider di-hover */
+.slider-wrapper:hover .zoom-tooltip {
+  opacity: 1;
+}
+
+/* Mempertebal Thumb Slider sedikit */
+.styled-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; 
+  height: 16px; 
+  width: 16px; 
+  border-radius: 50%;
+  margin-top: -6px; 
+  box-shadow: 0 0 5px rgba(0,0,0,0.8);
+}
+
+/* =========================================
+   Toggle Button Active State
+   ========================================= */
+.opt-toggle.active {
+  background: rgba(74, 222, 128, 0.15) !important;
+  border-color: var(--strokeorborder) !important;
+  color: var(--strokeorborder) !important;
+  box-shadow: inset 0 0 8px rgba(74, 222, 128, 0.3);
+}
+
+.opt-toggle.active .toggle-status {
+  color: #fff;
+  opacity: 1 !important;
+  font-weight: bold;
+}
+
+/* =========================================
+   Active State untuk Toggle dan Mode
+   ========================================= */
+.opt-toggle.active,
+.opt-mode.active {
+  background: rgba(74, 222, 128, 0.15) !important;
+  border-color: var(--strokeorborder) !important;
+  color: var(--strokeorborder) !important;
+  box-shadow: inset 0 0 8px rgba(74, 222, 128, 0.3);
+}

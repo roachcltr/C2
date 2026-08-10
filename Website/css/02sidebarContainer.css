@@ -1,0 +1,31 @@
+/* =========================================
+   LEFT SIDEBAR (Master Container)
+   ========================================= */
+#left-sidebar {
+  position: absolute;
+  top: 15px;
+  left: -5px;
+  bottom: 15px; /* Stretches to the bottom of the screen */
+  width: 300px;
+  z-index: 1000;
+  
+  /* Tactical Palette */
+  background: var(--black);
+  border: 1px solid var(--strokeorborder);
+  border-radius: 4px 0 4px 4px;
+  backdrop-filter: blur(5px);
+  
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px;
+  
+  /* GPU-Accelerated Slide Animation */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+}
+
+/* The state when the sidebar is hidden */
+#left-sidebar.collapsed {
+  transform: translateX(calc(-100%)); /* Slides off-screen to the left */
+  opacity: 0.8; /* Dims slightly when hidden */
+}

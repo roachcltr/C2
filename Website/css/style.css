@@ -1,0 +1,18 @@
+/* Main entry point — imports all partials in the original cascade order */
+@import url("00global.css");
+@import url("01buttons.css");
+@import url("02sidebarContainer.css");
+@import url("03sidebarTabs.css");
+@import url("04compass.css");
+@import url("05sidebarPanels.css");
+@import url("06sidebarSliders.css");
+@import url("07rings.css");
+@import url("08theme.css");
+@import url("09collapseChevron.css");
+@import url("10opacitySlider.css");
+@import url("11targets.css");
+@import url("12hardwareStatus.css");
+@import url("13legends.css");
+@import url("14sidebarScroll.css");
+@import url("15about.css");
+@import url("16cameraPanel.css");

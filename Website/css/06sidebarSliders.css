@@ -1,0 +1,83 @@
+/* =========================================
+   UI CONTROLS (Toggles & Sliders)
+   ========================================= */
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.control-label {
+  font-size: 14px;
+  color: #e0edff;
+  letter-spacing: 0.5px;
+}
+
+.icon-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--strokeorborder); /* Tactical Green */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.icon-toggle-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.icon-toggle-btn:hover {
+  color: #ffffff;
+  filter: drop-shadow(0 0 5px var(--glow));
+}
+
+.icon-toggle-btn.off {
+  color: rgba(255, 255, 255, 0.3); /* Dimmed when hidden */
+}
+
+/* =========================================
+   TOPO GRADIENT SLIDER 
+   ========================================= */
+.slider-tooltip {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px) scale(0.9);
+  background: #0f131a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: none;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.slider-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px 5px 0;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.2) transparent;
+  display: block;
+  width: 0;
+}
+
+.slider-tooltip.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}

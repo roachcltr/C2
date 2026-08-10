@@ -1,0 +1,9 @@
+node_modules/
+.env
+.DS_Store
+TMMR/CAT-048
+TMMR/CAT-240
+TMMR/Jet
+TMMR/kamikaze
+Server/Tracker/uWebSockets/
+Server/Tracker/TrackerNode

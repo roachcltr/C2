@@ -1,0 +1,27 @@
+/* =========================================
+   ABOUT PANEL LINKS
+   ========================================= */
+.about-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e0edff;
+  text-decoration: none;
+  font-size: 11px;
+  transition: all 0.2s ease;
+}
+
+.about-link:hover {
+  color: #ffffff;
+  text-shadow: 0 0 8px var(--glow);
+}
+
+.about-link svg {
+  stroke: var(--strokeorborder);
+  transition: all 0.2s ease;
+}
+
+.about-link:hover svg {
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 5px var(--glow));
+}

@@ -1,0 +1,73 @@
+/* =========================================
+   RING SELECTORS (Presisi Modular Grid & Smooth Animation)
+   ========================================= */
+.ring-selectors {
+  display: grid;
+  /* Membagi kolom secara otomatis sama rata dari ujung kiri ke kanan */
+  grid-template-columns: repeat(auto-fit, minmax(38px, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+  margin-bottom: 6px;
+  width: 100%;
+  
+  /* Animation Setup untuk Collapse */
+  max-height: 120px;
+  overflow: hidden;
+  opacity: 1;
+  transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, margin 0.3s ease;
+}
+
+/* The hidden state */
+.ring-selectors.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  pointer-events: none;
+}
+
+.ring-btn {
+  background: rgba(10, 13, 18, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 6px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Mencegah teks ter-block/terseleksi saat diklik cepat berulang kali */
+  -webkit-user-select: none;
+  user-select: none;
+  
+  /* Animasi super cepat (0.1s) dan stabil tanpa geser posisi hit-box */
+  transition: background 0.1s ease, border-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, transform 0.05s ease;
+}
+
+/* Efek Hover: Fokus pada perubahan warna & cahaya (Tanpa geser posisi translateY) */
+.ring-btn:hover {
+  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.6);
+  color: #ffffff;
+}
+
+/* Efek Klik/Tekan: Animasi penekanan instan (0.02s) agar super responsif */
+.ring-btn:active {
+  transform: scale(0.96);
+  transition: transform 0.02s ease;
+}
+
+/* Efek Tombol Terpilih (Active State) */
+.ring-btn.active {
+  background: rgba(74, 222, 128, 0.25);
+  border: 1px solid var(--strokeorborder);
+  color: var(--strokeorborder);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.3), inset 0 0 4px rgba(74, 222, 128, 0.2);
+}

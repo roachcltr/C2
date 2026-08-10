@@ -1,0 +1,339 @@
+/* =========================================
+   HARDWARE STATUS
+   ========================================= */
+.hardware-body {
+  gap: 10px;
+  padding: 12px;
+}
+
+.hardware-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0; 
+  background: var(--black);
+  border: 1px solid var(--panel);
+  border-radius: 4px;
+  padding: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hardware-card:hover {
+  border-color: var(--strokeorborder);
+  box-shadow: 0 0 8px var(--glow);
+}
+
+.hardware-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.hardware-settings {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px dashed var(--panel);
+}
+
+.hardware-settings.collapsed {
+  display: none;
+}
+
+.hardware-card-title {
+  font-family: 'Segoe UI', monospace;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--strokeorborder);
+}
+
+.hardware-card-subtitle {
+  font-family: 'Segoe UI', monospace;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  color: rgba(224, 237, 255, 0.5);
+  margin-top: 2px;
+}
+
+.hardware-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.hardware-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.hardware-led.inactive {
+  background: #ef4444;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.6);
+}
+
+.hardware-led.active {
+  background: var(--strokeorborder);
+  box-shadow: 0 0 6px var(--glow);
+  animation: hardware-led-blink 1.4s ease-in-out infinite;
+}
+
+@keyframes hardware-led-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+.hardware-status-text {
+  font-family: 'Segoe UI', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.hardware-status-text.inactive { color: #ef4444; }
+.hardware-status-text.active { color: var(--strokeorborder); }
+
+/* =========================================
+   RIGHT CAMERA PANEL (SLIDE IN FROM RIGHT)
+   ========================================= */
+#right-camera-panel {
+  position: absolute;
+  top: 70px;
+  right: 0;
+  width: 420px;
+  height: 420px;
+  background: var(--black);
+  border: 1px solid var(--panel);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.25, 1);
+  box-shadow: -4px 4px 16px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+
+#right-camera-panel.closed {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#right-camera-panel.maximized {
+  width: 800px;
+  height: 700px;
+}
+
+#right-camera-panel.minimized {
+  height: 35px;
+}
+#right-camera-panel.minimized .camera-feed-container {
+  display: none;
+}
+
+.camera-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--panel);
+}
+
+.camera-panel-title {
+  font-family: 'Segoe UI', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--strokeorborder);
+  letter-spacing: 1px;
+}
+
+.camera-ctrl-btn {
+  background: none;
+  border: none;
+  color: rgba(224, 237, 255, 0.5);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+#minimize-camera-btn:hover, 
+#maximize-camera-btn:hover {
+  color: var(--strokeorborder);
+}
+
+#close-camera-btn:hover {
+  color: #ef4444;
+}
+
+.camera-feed-container {
+  flex: 1;
+  background: #000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-feed-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: rgba(224, 237, 255, 0.3);
+  font-family: 'Segoe UI', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+/* =========================================
+   PTZ & COMPASS CONTROL UI
+   ========================================= */
+.camera-ptz-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 90px;
+  background: rgba(0, 0, 0, 0.5);
+  border-top: 1px solid var(--panel);
+  padding: 0 16px;
+  flex-shrink: 0;
+}
+
+/* --- Compass & Azimuth Section --- */
+.ptz-azimuth-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ptz-compass {
+  width: 60px;
+  height: 60px;
+  position: relative;
+}
+
+.compass-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(0deg); /* Akan dikendalikan oleh JS nantinya */
+  transition: transform 0.3s ease-out;
+}
+
+.azimuth-readout {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.az-label {
+  font-family: 'Segoe UI', monospace;
+  font-size: 9px;
+  color: rgba(224, 237, 255, 0.5);
+  letter-spacing: 1px;
+}
+
+.az-value {
+  font-family: 'Segoe UI', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--strokeorborder);
+  letter-spacing: 2px;
+}
+
+/* --- PTZ Controls Section --- */
+.ptz-controls-section {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.ptz-btn {
+  background: transparent;
+  border: 1px solid var(--panel);
+  color: rgba(224, 237, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ptz-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--strokeorborder);
+  color: var(--strokeorborder);
+  box-shadow: 0 0 8px var(--glow);
+}
+
+.ptz-btn:active {
+  transform: scale(0.95);
+  background: var(--strokeorborder);
+  color: #000;
+}
+
+/* Zoom Controls */
+.ptz-zoom-controls {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--panel);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.zoom-btn {
+  width: 32px;
+  height: 30px;
+  border: none;
+  border-radius: 0;
+}
+
+.ptz-divider {
+  height: 1px;
+  background: var(--panel);
+  width: 100%;
+}
+
+/* D-Pad Controls */
+.ptz-dpad {
+  display: grid;
+  grid-template-areas:
+    ". up ."
+    "left center right"
+    ". down .";
+  gap: 4px;
+}
+
+.dpad-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+}
+
+.dpad-btn.up { grid-area: up; }
+.dpad-btn.down { grid-area: down; }
+.dpad-btn.left { grid-area: left; }
+.dpad-btn.right { grid-area: right; }
+
+.dpad-center {
+  grid-area: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dpad-center-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--panel);
+  border-radius: 50%;
+}

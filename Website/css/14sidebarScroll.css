@@ -1,0 +1,76 @@
+/* =========================================
+   CUSTOM SCROLLBAR
+   ========================================= */
+
+/* Matikan scrollbar default di kontainer luar */
+#sidebar-content {
+  scrollbar-width: none;
+}
+#sidebar-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Terapkan custom scrollbar HANYA di bagian body Map Controls */
+#panel-map-settings .section-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--panel) transparent;
+}
+#panel-map-settings .section-body::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+#panel-map-settings .section-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+#panel-map-settings .section-body::-webkit-scrollbar-thumb {
+  background: var(--panel);
+  border-radius: 3px;
+}
+#panel-map-settings .section-body::-webkit-scrollbar-thumb:hover {
+  background: var(--strokeorborder);
+  box-shadow: 0 0 6px var(--glow);
+}
+
+#panel-map-settings .section-body > * {
+  flex-shrink: 0;
+}
+
+/* =========================================
+   TACTICAL SCROLLBARS
+   ========================================= */
+
+/* Firefox Support (Global) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--panel) rgba(10, 15, 24, 0.3);
+}
+
+/* WebKit Browsers (Chrome, Edge, Safari, Opera) */
+::-webkit-scrollbar {
+  width: 6px;  /* Vertical scrollbar width */
+  height: 6px; /* Horizontal scrollbar height */
+}
+
+/* The track (background behind the scrollbar) */
+::-webkit-scrollbar-track {
+  background: rgba(10, 15, 24, 0.3); 
+  border-radius: 4px;
+}
+
+/* The draggable handle */
+::-webkit-scrollbar-thumb {
+  background: var(--panel); 
+  border-radius: 4px;
+  /* Adds a microscopic border to make it pop slightly from the track */
+  border: 1px solid rgba(255, 255, 255, 0.05); 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--strokeorborder); 
+}
+
+/* Corner where horizontal and vertical scrollbars meet */
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

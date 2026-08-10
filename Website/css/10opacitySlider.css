@@ -1,0 +1,50 @@
+/* =========================================
+   TACTICAL OPACITY SLIDERS
+   ========================================= */
+.tactical-slider {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 60px; /* Keep it compact */
+  height: 4px;
+  background: var(--panel);
+  border-radius: 2px;
+  outline: none;
+  margin-right: 8px;
+  transition: all 0.2s;
+}
+
+/* The draggable thumb (Chrome/Safari/Edge) */
+.tactical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--strokeorborder);
+  cursor: pointer;
+  box-shadow: 0 0 5px var(--glow);
+  transition: transform 0.1s;
+}
+
+.tactical-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 8px var(--glow);
+}
+
+/* The draggable thumb (Firefox) */
+.tactical-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: none;
+  border-radius: 50%;
+  background: var(--strokeorborder);
+  cursor: pointer;
+  box-shadow: 0 0 5px var(--glow);
+  transition: transform 0.1s;
+}
+
+.tactical-slider::-moz-range-thumb:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 8px var(--glow);
+}

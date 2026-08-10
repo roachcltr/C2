@@ -1,0 +1,88 @@
+/* =========================================
+   THEME SETTINGS (Bottom Right)
+   ========================================= */
+#theme-btn {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  z-index: 1000;
+  
+  background: var(--black);
+  border: 1px solid var(--strokeorborder);
+  color: var(--strokeorborder);
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+#theme-btn:hover {
+  background: var(--hover);
+  box-shadow: 0 0 10px var(--glow);
+  transform: scale(1.2); /* Cool gear spin effect */
+}
+
+#theme-popup {
+  position: absolute;
+  bottom: 60px;
+  right: 15px;
+  width: 200px;
+  z-index: 1000;
+  
+  background: var(--black);
+  border: 1px solid var(--strokeorborder);
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  
+  transition: transform 0.1s ease, opacity 0.3s ease;
+  transform-origin: bottom right;
+}
+
+#theme-popup.collapsed {
+  transform: scale(0.8) translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.theme-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Segoe UI', monospace;
+  font-size: 11px;
+  color: #e0edff;
+}
+
+/* Style the native color picker */
+.theme-row input[type="color"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 1px solid var(--panel);
+  width: 24px;
+  height: 24px;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+  background: transparent;
+}
+.theme-row input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 1px;
+}
+.theme-row input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 2px;
+}

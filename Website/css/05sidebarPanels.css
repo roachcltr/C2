@@ -1,0 +1,48 @@
+/* =========================================
+   INNER PANEL SHELLS
+   ========================================= */
+.sidebar-section {
+  border: 1px solid var(--panel); /* Softer green for inner panels */
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-header {
+  font-family: 'Segoe UI', monospace;
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--strokeorborder);
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--panel);
+  letter-spacing: 1px;
+  background: var(--header); /* Faint highlight for headers */
+}
+
+.section-body {
+  padding: 12px;
+  font-family: 'Segoe UI', monospace;
+  font-size: 11px;
+  color: #e0edff;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* =========================================
+   PANEL BOX WRAPPER ()
+   ========================================= */
+#panel-map-settings {
+  border: none;
+  background: transparent;
+  gap: 15px;
+}
+
+.panel-box {
+  border: 1px solid var(--panel);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+}

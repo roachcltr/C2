@@ -1,0 +1,102 @@
+/* =========================================
+   MAP LEGEND (HIGH-DENSITY)
+   ========================================= */
+.legend-body {
+  gap: 4px; /* Reduced from 8px */
+  padding: 8px 12px; /* Tighter padding inside the body */
+}
+
+.legend-group-title {
+  font-size: 13px; /* Reduced from 13px */
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: rgba(224, 237, 255, 0.65);
+  margin: 2px 0 4px 0; /* Massively compressed margins */
+}
+
+.legend-divider {
+  border-color: var(--panel);
+  width: 100%;
+  margin: 6px 0; /* Compressed from 10px 0 8px 0 */
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 6px; /* Compressed from 10px */
+  column-gap: 8px; /* Compressed from 12px */
+}
+
+/* NEW: 3-column layout for short text to save vertical space */
+.legend-grid.three-col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Compressed from 8px */
+  font-size: 13px; /* Scaled down slightly */
+  color: #e0edff;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.legend-swatch {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+}
+
+/* Square (Fixed Wing / Alarm / Jammed / Tracking) */
+.legend-swatch.shape-square {
+  border-radius: 2px;
+}
+
+/* Triangle (High Speed) — pure CSS border trick, no background */
+.legend-swatch.shape-triangle {
+  width: 0;
+  height: 0;
+  background: transparent !important;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 13px solid; /* color set inline via border-bottom-color */
+}
+
+/* Pentagon (HST Evasive) */
+.legend-swatch.shape-pentagon {
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+}
+
+/* Diamond (Bogey) */
+.legend-swatch.shape-diamond {
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+/* Circle, filled (Site Radar) */
+.legend-swatch.shape-circle {
+  border-radius: 50%;
+}
+
+/* Ring, outline only (Danger Zone) */
+.legend-swatch.shape-ring {
+  background: transparent !important;
+  border: 2px solid;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+/* Line (Prediction) */
+.legend-swatch.shape-line {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  align-self: center;
+}
+
+.legend-swatch.shape-cross {
+  clip-path: polygon(33% 0%, 67% 0%, 67% 33%, 100% 33%, 100% 67%, 67% 67%, 67% 100%, 33% 100%, 33% 67%, 0% 67%, 0% 33%, 33% 33%);
+  border-radius: 0;
+}
