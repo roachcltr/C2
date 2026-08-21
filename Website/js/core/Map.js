@@ -1,6 +1,6 @@
 export let cesiumViewer = null;
-export const SITE_LAT = -7.749786; 
-export const SITE_LON = 108.502177;
+export const SITE_LAT = -6.950689; 
+export const SITE_LON = 107.619899;
 
 export async function initMap() {
   // Your active Cesium Ion token

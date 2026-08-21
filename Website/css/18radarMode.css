@@ -1,0 +1,21 @@
+/* Radar (Scope) Mode: sembunyikan semua tile peta, tampilkan canvas scope
+   hitam fullscreen sebagai gantinya. */
+
+#radar-scope-canvas {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    z-index: 0;
+}
+
+body.radar-mode #cesium-container,
+body.radar-mode .leaflet-container {
+    display: none !important;
+}
+
+body.radar-mode #radar-scope-canvas {
+    display: block;
+}

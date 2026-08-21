@@ -1,0 +1,61 @@
+/* =========================================
+   LITE MODE - override untuk device low-spec
+   (dual-core CPU, tanpa GPU/WebGL hardware)
+   Aktif saat <body class="lite-mode">
+   ========================================= */
+
+body.lite-mode * {
+  /* Matikan semua transisi & animasi CSS - sumber repaint/compositing berulang */
+  transition: none !important;
+  animation: none !important;
+}
+
+body.lite-mode .icon-toggle-btn:hover,
+body.lite-mode .about-link,
+body.lite-mode .ring-btn {
+  filter: none !important;
+}
+
+/* backdrop-filter: blur() memaksa GPU compositing layer terus-menerus */
+body.lite-mode #left-sidebar,
+body.lite-mode .sidebar-tabs-vertical,
+body.lite-mode .sidebar-section,
+body.lite-mode #theme-popup,
+body.lite-mode #right-camera-panel,
+body.lite-mode .hardware-card,
+body.lite-mode .camera-panel-header,
+body.lite-mode .hud-overlay {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: rgba(10, 13, 18, 0.92) !important;
+}
+
+/* box-shadow glow di banyak elemen tema - ganti jadi border tipis, tanpa shadow */
+body.lite-mode * {
+  box-shadow: none !important;
+}
+
+/* LED indikator hardware: matikan blink infinite */
+body.lite-mode .hardware-led {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Kontrol khusus Cesium 3D (compass, base view, reset view, rings, azimuth,
+   grid, terrain, brightness/saturation) - tidak berlaku untuk peta 2D Leaflet. */
+body.lite-mode .cesium-only {
+  display: none !important;
+}
+
+/* Marker/label track di peta Lite (Leaflet) */
+.track-label-lite {
+  background: rgba(10, 13, 18, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
+  font-family: 'Segoe UI', monospace;
+  font-size: 11px !important;
+  padding: 2px 5px !important;
+}
+.track-label-lite::before {
+  display: none !important;
+}

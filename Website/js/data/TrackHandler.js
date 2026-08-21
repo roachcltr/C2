@@ -1,4 +1,7 @@
 import { updateCesiumMarkers } from '../entities/trackMain.js';
+import { updateLeafletMarkers } from '../entities/trackMainLite.js';
+import { updateRadarMarkers } from '../core/MapRadar.js';
+import { isLiteModeActive, isRadarModeActive } from '../core/settings.js';
 import { updateTracksTableUI } from '../ui/panels/tabTargets.js'; // Pastikan jalur path ini benar sesuai lokasinya
 
 // ==========================================
@@ -19,8 +22,14 @@ export function handleIncomingTrack(trackData) {
         }
     }
 
-    // 2. Push the updated dictionary to the rendering engine
-    updateCesiumMarkers(activeTracks);
+    // 2. Push the updated dictionary to the active rendering engine
+    if (isRadarModeActive()) {
+        updateRadarMarkers(activeTracks);
+    } else if (isLiteModeActive()) {
+        updateLeafletMarkers(activeTracks);
+    } else {
+        updateCesiumMarkers(activeTracks);
+    }
 
     // 3. Konversi Object activeTracks menjadi Array untuk UI
     const tracksList = Object.values(activeTracks).map(track => {

@@ -367,6 +367,30 @@
   <!-- css udah dipindah ya -->
 
   <div id="right-camera-panel" class="closed">
+
+    <!-- ========================================== -->
+    <!-- SLIDE-OUT TRACKLIST (SEMBUNYI DI BELAKANG) -->
+    <!-- ========================================== -->
+    <div id="tracklist-sidebar" class="collapsed">
+        <div class="sidebar-track-header">
+            <span>AI TRACKLIST</span>
+            <span class="track-badge" id="tracklist-count">0</span>
+        </div>
+        <div class="sidebar-track-body">
+            <div id="ai-table-container">
+                <div style="text-align:center; margin-top:20px; color:#8ba2b5; font-size:11px;">NO TARGETS DETECTED</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB TOGGLE UNTUK TRACKLIST (NEMPEL DI KIRI) -->
+    <button id="tracklist-toggle-btn" title="Toggle Tracklist">
+        <svg class="chevron-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/> 
+        </svg>
+        <span class="tab-text">TRACKLIST</span>
+    </button>
+
     <div class="camera-panel-header">
       <span class="camera-panel-title">OPTRONIC CAMERA</span>
       <div style="display: flex; gap: 8px; align-items: center;">
@@ -387,8 +411,21 @@
       
       <!-- Video Area -->
       <div class="video-wrapper">
-        <img id="optronic-stream" alt="Optronic Live Feed">
+        <div style="position: relative; width: 100%; max-width: 1920px; aspect-ratio: 16/9;">
+            <!-- MediaMTX handles all the WebRTC complexity natively -->
+            <iframe id="optronic-stream" 
+                    src="" 
+                    style="width: 100%; height: 100%; border: none;">
+            </iframe>
+            
+            <!-- This transparent layer sits on top to intercept your mouse clicks -->
+            <div id="video-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; z-index: 10;"></div>
+        </div>
       </div>
+
+      <!-- Daftar calon target dari detector.py (classical CV) — diisi oleh updateCandidateTargets() -->
+      <div id="candidate-targets-container" style="padding: 8px;"></div>
+      <div id="ai-table-container" style="padding: 10px 10px 0 10px;"></div>
 
       <!-- HUD OVERLAY (PRO UI/UX DASHBOARD) -->
       <div class="hud-overlay" id="hud-overlay-panel">
@@ -399,14 +436,14 @@
         </button>
 
         <div class="hud-compact-row" style="align-items: stretch;">
-          
+
           <!-- BLOK KIRI: Sensors, Optik, Media -->
           <div class="hud-left-block" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 4px;">
             
             <!-- Baris 1: Sensor & PIP -->
             <div class="hud-group" style="padding: 4px 6px; justify-content: space-between;">
-              <button class="hud-btn opt-cmd opt-mode active" data-cmd="VL" style="flex: 1; padding: 4px 2px;">VL</button>
-              <button class="hud-btn opt-cmd opt-mode" data-cmd="IR" style="flex: 1; padding: 4px 2px;">IR</button>
+              <button class="hud-btn opt-cmd opt-mode active" data-cmd="VL" style="flex: 1; padding: 4px 2px;" title="Visual Mode (M)">VL</button>
+              <button class="hud-btn opt-cmd opt-mode" data-cmd="IR" style="flex: 1; padding: 4px 2px;" title="Infrared Mode (M)">IR</button>
               <div class="divider"></div>
               <button class="hud-btn opt-cmd opt-mode" data-cmd="PIP_VL_MAIN" style="flex: 1; padding: 4px 2px;">PIP VL</button>
               <button class="hud-btn opt-cmd opt-mode" data-cmd="PIP_IR_MAIN" style="flex: 1; padding: 4px 2px;">PIP IR</button>
@@ -415,38 +452,40 @@
             <!-- Baris 2: Tracking & Laser -->
             <div class="hud-group" style="padding: 4px 6px; justify-content: space-between;">
               <!-- TOMBOL BARU UNTUK TOGGLE AI BAWAAN KAMERA -->
-              <button class="hud-btn opt-toggle" data-cmd-on="AI_ON" data-cmd-off="AI_OFF" style="flex: 1; padding: 4px 2px;" title="AI Switch (91H)">AI TRACK</button>
+              <button class="hud-btn opt-toggle" data-cmd-on="AI_ON" data-cmd-off="AI_OFF" style="flex: 1; padding: 4px 2px;" title="AI Switch">AI TRACK</button>
               <div class="divider"></div>
-              <button class="hud-btn opt-cmd" data-cmd="LOCK" style="flex: 1; padding: 4px 2px;">LOCK</button>
-              <button class="hud-btn opt-cmd danger" data-cmd="UNTRACK" style="flex: 1; padding: 4px 2px;">UNTRACK</button>
+              <button class="hud-btn opt-cmd" data-cmd="AI_LOCK" style="flex: 1; padding: 4px 2px;" title="Lock Target (Y)">LOCK</button>
+              <button class="hud-btn opt-cmd danger" data-cmd="UNTRACK" style="flex: 1; padding: 4px 2px;" title="Untrack / Cancel (N)">UNTRACK</button>
               <div class="divider"></div>
-              <button class="hud-btn opt-cmd" data-cmd="LASER_SINGLE" style="flex: 1; padding: 4px 2px;">LRF</button>
-              <button class="hud-btn opt-toggle" data-cmd-on="LASER_CONT" data-cmd-off="LASER_STOP" style="flex: 1; padding: 4px 2px;">LRF CONT</button>
+              <button class="hud-btn opt-cmd" data-cmd="LASER_SINGLE" style="flex: 1; padding: 4px 2px;" title="Laser Single (L)">LRF</button>
+              <button class="hud-btn opt-toggle" data-cmd-on="LASER_CONT" data-cmd-off="LASER_STOP" style="flex: 1; padding: 4px 2px;" title="Laser Continuous (K)">LRF CONT</button>
             </div>
 
             <!-- Baris 3: VL Optics & Enhancements -->
             <div class="hud-group" style="padding: 4px 6px; justify-content: space-between;">
-              <button class="hud-btn opt-toggle" data-cmd-on="VL_DEFOG_ON" data-cmd-off="VL_DEFOG_OFF" style="flex: 1; padding: 4px 2px;" title="Fog Penetration (4AH)">DEFOG</button>
-              <button class="hud-btn opt-toggle" data-cmd-on="VL_LOWLIGHT_ON" data-cmd-off="VL_LOWLIGHT_OFF" style="flex: 1; padding: 4px 2px;" title="Low-light Mode (4BH)">NIGHT_VIS</button>
+              <button class="hud-btn opt-toggle" data-cmd-on="VL_DEFOG_ON" data-cmd-off="VL_DEFOG_OFF" style="flex: 1; padding: 4px 2px;" title="Fog Penetration">DEFOG</button>
+              <button class="hud-btn opt-toggle" data-cmd-on="VL_LOWLIGHT_ON" data-cmd-off="VL_LOWLIGHT_OFF" style="flex: 1; padding: 4px 2px;" title="Low-light Mode">NIGHT_VIS</button>
               <div class="divider"></div>
-              <button class="hud-btn opt-cmd" data-cmd="VL_FOCUS_AUTO" style="flex: 1; padding: 4px 2px;" title="Auto Focus (45H)">AF VL</button>
+              <button class="hud-btn opt-cmd" data-cmd="VL_FOCUS_AUTO" style="flex: 1; padding: 4px 2px;" title="Auto Focus">AF VL</button>
             </div>
 
             <!-- Baris 4: IR Optics & Enhancements -->
             <div class="hud-group" style="padding: 4px 6px; justify-content: space-between;">
-              <button class="hud-btn opt-cmd" data-cmd="IR_PALETTE" style="flex: 1; padding: 4px 2px;" title="Pseudo-colour (53H)">PALETTE</button>
-              <button class="hud-btn opt-cmd" data-cmd="IR_NUC" style="flex: 1; padding: 4px 2px;" title="Shutter Compensation (56H)">NUC/CAL</button>
+              <button class="hud-btn opt-cmd" data-cmd="IR_PALETTE" style="flex: 1; padding: 4px 2px;" title="Pseudo-colour">PALETTE</button>
+              <button class="hud-btn opt-cmd" data-cmd="IR_NUC" style="flex: 1; padding: 4px 2px;" title="Shutter Compensation">NUC/CAL</button>
               <div class="divider"></div>
-              <button class="hud-btn opt-cmd" data-cmd="IR_FOCUS_AUTO" style="flex: 1; padding: 4px 2px;" title="Auto Focus (50H)">AF IR</button>
+              <button class="hud-btn opt-cmd" data-cmd="IR_FOCUS_AUTO" style="flex: 1; padding: 4px 2px;" title="Auto Focus">AF IR</button>
             </div>
 
             <!-- Baris 5: Media & System -->
             <div class="hud-group" style="padding: 4px 6px; justify-content: space-between;">
-              <button class="hud-btn opt-cmd" data-cmd="SEQ_SWITCH" style="flex: 1; padding: 4px 2px;" title="IR/VL Sequence Switch (31H)">SEQ SW</button>
-              <button class="hud-btn opt-cmd" data-cmd="SCREENSHOT" style="flex: 1; padding: 4px 2px;" title="Screenshot (32H)">SNAP</button>
+              <button class="hud-btn opt-cmd" data-cmd="SEQ_SWITCH" style="flex: 1; padding: 4px 2px;" title="IR/VL Sequence Switch">SEQ SW</button>
+              <!-- TOMBOL TOGGLE OSD BARU -->
+              <button class="hud-btn opt-toggle" data-cmd-on="OSD_LANG_9" data-cmd-off="OSD_LANG_8" style="flex: 1; padding: 4px 2px;" title="Toggle OSD Mode">OSD</button>
+              <button class="hud-btn opt-cmd" data-cmd="SCREENSHOT" style="flex: 1; padding: 4px 2px;" title="Screenshot">SNAP</button>
               <div class="divider"></div>
-              <button class="hud-btn opt-toggle" data-cmd-on="RECORD_START" data-cmd-off="RECORD_STOP" style="flex: 1; padding: 4px 2px;" title="Video Record (33H)">REC</button>
-              <button class="hud-btn opt-toggle" data-cmd-on="CONT_CAP_START" data-cmd-off="CONT_CAP_STOP" style="flex: 1; padding: 4px 2px;" title="Continuous Capture (34H)">CAP LOOP</button>
+              <button class="hud-btn opt-toggle" data-cmd-on="RECORD_START" data-cmd-off="RECORD_STOP" style="flex: 1; padding: 4px 2px;" title="Video Record">REC</button>
+              <button class="hud-btn opt-toggle" data-cmd-on="CONT_CAP_START" data-cmd-off="CONT_CAP_STOP" style="flex: 1; padding: 4px 2px;" title="Continuous Capture">CAP LOOP</button>
             </div>
 
           </div>
@@ -457,15 +496,15 @@
             <!-- PTZ D-Pad -->
             <div class="mini-dpad" style="margin-top: 2px;">
               <div></div>
-              <button class="dpad-btn opt-hold" data-cmd-start="UP" data-cmd-stop="STOP"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg></button>
+              <button class="dpad-btn opt-hold" data-cmd-start="UP" data-cmd-stop="STOP" title="Up (W)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 15-6-6-6 6"/></svg></button>
               <div></div>
-              <button class="dpad-btn opt-hold" data-cmd-start="LEFT" data-cmd-stop="STOP"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>
-              <button class="dpad-btn center opt-cmd" data-cmd="CENTER" title="Center">
+              <button class="dpad-btn opt-hold" data-cmd-start="LEFT" data-cmd-stop="STOP" title="Left (A)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>
+              <button class="dpad-btn center opt-cmd" data-cmd="CENTER" title="Center (C)">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="6"/></svg>
               </button>
-              <button class="dpad-btn opt-hold" data-cmd-start="RIGHT" data-cmd-stop="STOP"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+              <button class="dpad-btn opt-hold" data-cmd-start="RIGHT" data-cmd-stop="STOP" title="Right (D)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
               <div></div>
-              <button class="dpad-btn opt-hold" data-cmd-start="DOWN" data-cmd-stop="STOP"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+              <button class="dpad-btn opt-hold" data-cmd-start="DOWN" data-cmd-stop="STOP" title="Down (S)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
               <div></div>
             </div>
 
@@ -476,10 +515,10 @@
               <div class="mini-zoom-control" style="justify-content: center; gap: 12px; width: 100%;">
                 <span class="zoom-lbl vl" style="padding: 4px 0; font-size: 9px; width: 24px; border-radius: 4px;">VL</span>
                 <div style="display: flex; gap: 4px;">
-                  <button class="hud-btn opt-hold" data-cmd-start="VL_ZOOM_OUT" data-cmd-stop="VL_ZOOM_STOP" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center;" title="Zoom Out">
+                  <button class="hud-btn opt-hold" data-cmd-start="VL_ZOOM_OUT" data-cmd-stop="VL_ZOOM_STOP" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center;" title="Zoom Out (X)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/></svg>
                   </button>
-                  <button class="hud-btn opt-hold" data-cmd-start="VL_ZOOM_IN" data-cmd-stop="VL_ZOOM_STOP" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center;" title="Zoom In">
+                  <button class="hud-btn opt-hold" data-cmd-start="VL_ZOOM_IN" data-cmd-stop="VL_ZOOM_STOP" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center;" title="Zoom In (Z)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                   </button>
                 </div>
@@ -502,11 +541,10 @@
 
             <!-- AUTO PATROL -->
             <div class="hud-group" style="padding: 4px; justify-content: center; width: 100%;">
-              <button class="hud-btn opt-toggle" data-cmd-on="PATROL" data-cmd-off="STOP" style="flex: 1; padding: 4px 2px;">AUTO PATROL</button>
+              <button class="hud-btn opt-toggle" data-cmd-on="PATROL" data-cmd-off="STOP" style="flex: 1; padding: 4px 2px;" title="Auto Patrol">AUTO PATROL</button>
             </div>
 
           </div>
-
         </div>
 
       </div>

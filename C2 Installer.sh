@@ -177,13 +177,15 @@ echo ""
 # ==========================================
 # PHASE 2: OPTRONIC PYTHON ENVIRONMENT
 # ==========================================
-echo -e "${CYAN}${BOLD}--- Phase 2: Python Optronic Environment ---${NC}"
+echo -e "${CYAN}${BOLD}--- Phase 2: Optronic Environment ---${NC}"
 if ! command -v python3 &> /dev/null; then
     execute_step "Installing Python3 core packages" sudo apt install python3 -y
 fi
 execute_step "Installing Python3 PIP" sudo apt install python3-pip -y
 execute_step "Mapping 'python' command to Python3" sudo apt install python-is-python3 -y
-execute_step "Installing websockets, opencv-python, flask (Global PEP 668 Override)" pip install websockets opencv-python flask --break-system-packages 
+execute_step "Installing websockets, opencv-python, flask (Global PEP 668 Override)" pip install websockets websocket-client opencv-python flask --break-system-packages 
+execute_step "Installing GStreamer" apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio -y
+execute_step "Installing RTSP" sudo apt install gstreamer1.0-rtsp -y
 echo ""
 
 # ==========================================

@@ -1,12 +1,13 @@
 // js/ui/panels/tabTargets.js
 import { cesiumViewer } from '../../core/Map.js';
 import { sendOptronicCommand } from '../../hardware/optronic.js';
-import { openTrackPopup, closeTrackPopup } from '../../entities/trackPopup.js';
-import { clearRawJsonDisplay } from './tabSystemNetworking.js';
 
 // Global state to track what the user is currently looking at
 let currentSelectedTrackId = null;
 let activeTrackedId = null;
+
+// NEW: Global state to track which drone tubes have been fired
+const emptyTubes = new Set([6, 11]); // Starting with 6 and 11 empty for realism
 
 export function initGlobalEntitiesTab() {
     const tbody = document.getElementById('tracks-tbody');
@@ -173,16 +174,12 @@ export function renderSelectedTargetUI(trackJson, isSilentUpdate = false) {
 
     const id = trackJson.track_id || 'UNKNOWN';
     currentSelectedTrackId = id; // Update global state
-    window.selectedTargetId = id;
 
     // If it's a silent live update, just update the text values to prevent flickering
     if (isSilentUpdate && !jsonCard.classList.contains('hidden')) {
         updateCardLiveValues(trackJson);
         return;
     }
-
-    // --- TRIGGER MAP POPUP ---
-    openTrackPopup(id); // <-- ADD THIS
 
     // --- FULL RENDER FOR NEW SELECTIONS ---
     emptyMsg.style.display = 'none';
@@ -245,6 +242,7 @@ export function renderSelectedTargetUI(trackJson, isSilentUpdate = false) {
     const targetEntityId = `track_${id}`;
     let isTracking = cesiumViewer && cesiumViewer.trackedEntity && cesiumViewer.trackedEntity.id === targetEntityId;
 
+    const iconIntercept = `<svg width="14" height="14" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 10h4v4h-4zm0 0L6.5 6.5M9.96 6A3.5 3.5 0 1 0 6 9.96m8 .04l3.5-3.5m.5 3.46A3.5 3.5 0 1 0 14.04 6M14 14l3.5 3.5m-3.46.5A3.5 3.5 0 1 0 18 14.04M10 14l-3.5 3.5M6 14.04A3.5 3.5 0 1 0 9.96 18"/></svg>`;
     const iconView = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>`;
     const iconCam = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>`;
     const iconClose = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
@@ -256,16 +254,23 @@ export function renderSelectedTargetUI(trackJson, isSilentUpdate = false) {
     const camBorderColor = isCamTracking ? '#be123c' : '#ca8a04';
     const camLabel = isCamTracking ? 'STOP CAM' : 'CAM';
 
+    // New Intercept Button
+    const interceptBtn = createButton('INTERCEPT', iconIntercept, 'rgba(168, 85, 247, 0.2)', 'rgba(168, 85, 247, 0.5)', '#9333ea');
     const viewBtn = createButton(isTracking ? 'UNVIEW' : 'VIEW', iconView, 'rgba(14, 165, 233, 0.2)', 'rgba(14, 165, 233, 0.5)', '#0284c7');
     const camBtn = createButton(camLabel, iconCam, camBaseBg, camHoverBg, camBorderColor);
     const deselectBtn = createButton('CLOSE', iconClose, 'rgba(225, 29, 72, 0.2)', 'rgba(225, 29, 72, 0.5)', '#be123c');
 
+    interceptBtn.addEventListener('click', () => {
+        openInterceptModal(id);
+    });
+
     viewBtn.addEventListener('click', () => {
         if (!cesiumViewer) return;
+        const labelSpan = viewBtn.querySelector('.btn-label');
         if (isTracking) {
             cesiumViewer.trackedEntity = undefined;
             cesiumViewer.camera.cancelFlight(); 
-            viewBtn.innerHTML = `${iconView} <span style="white-space: nowrap;">VIEW</span>`;
+            if(labelSpan) labelSpan.innerText = 'VIEW';
             isTracking = false;
         } else {
             cesiumViewer.trackedEntity = undefined; 
@@ -273,7 +278,7 @@ export function renderSelectedTargetUI(trackJson, isSilentUpdate = false) {
             
             const targetEntity = cesiumViewer.entities.getById(targetEntityId);
             if (targetEntity) {
-                viewBtn.innerHTML = `${iconView} <span style="white-space: nowrap;">UNVIEW</span>`;
+                if(labelSpan) labelSpan.innerText = 'UNVIEW';
                 isTracking = true;
                 cesiumViewer.flyTo(targetEntity, {
                     offset: new Cesium.HeadingPitchRange(0.0, Cesium.Math.toRadians(-35.0), 3000),
@@ -316,6 +321,8 @@ export function renderSelectedTargetUI(trackJson, isSilentUpdate = false) {
         clearSelectedTarget();
     });
 
+    // Added Intercept button first in the container hierarchy
+    btnContainer.appendChild(interceptBtn);
     btnContainer.appendChild(viewBtn);
     btnContainer.appendChild(camBtn);
     btnContainer.appendChild(deselectBtn);
@@ -323,13 +330,170 @@ export function renderSelectedTargetUI(trackJson, isSilentUpdate = false) {
 }
 
 // =====================================================================
+// TACTICAL INTERCEPT MODAL LOGIC (AUTO-INJECTED)
+// =====================================================================
+
+function openInterceptModal(targetId) {
+    let overlay = document.getElementById('intercept-modal-overlay');
+    
+    // Inject the DOM and CSS elements on the first click
+    if (!overlay) {
+        // --- 1. Inject Styles ---
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #intercept-modal-overlay {
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                background: rgba(0, 0, 0, 0.85); z-index: 9999;
+                display: flex; align-items: center; justify-content: center;
+                backdrop-filter: blur(5px);
+            }
+            #intercept-modal-overlay.hidden { display: none; }
+            .intercept-modal {
+                background: #111827; border: 1px solid #9333ea; border-radius: 8px;
+                width: 520px; display: flex; flex-direction: column;
+                box-shadow: 0 0 30px rgba(147, 51, 234, 0.25);
+            }
+            .intercept-modal .modal-header {
+                background: rgba(147, 51, 234, 0.15); padding: 12px 20px;
+                border-bottom: 1px solid #9333ea; display: flex; justify-content: space-between;
+                align-items: center; font-weight: bold; color: #c084fc; font-family: monospace; letter-spacing: 1.5px;
+            }
+            .intercept-modal .close-btn {
+                background: none; border: none; color: #c084fc; font-size: 24px; line-height: 1; cursor: pointer; padding: 0;
+            }
+            .intercept-modal .close-btn:hover { color: #ffffff; }
+            .intercept-modal .modal-body { padding: 24px; }
+            .launcher-grid {
+                display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+                background: #1e1e24; padding: 16px; border: 2px solid #3f3f46; border-radius: 6px;
+            }
+            .drone-slot {
+                aspect-ratio: 1; background: #09090b; border: 2px solid #52525b; border-radius: 4px;
+                display: flex; align-items: center; justify-content: center;
+                cursor: pointer; position: relative; transition: all 0.2s;
+            }
+            .drone-slot:hover:not(.empty) { 
+                border-color: #9333ea; background: rgba(147, 51, 234, 0.1); 
+            }
+            .drone-slot.selected { 
+                border-color: #facc15; background: rgba(250, 204, 21, 0.15); 
+                box-shadow: 0 0 15px rgba(250, 204, 21, 0.4) inset; 
+            }
+            .drone-slot.empty { cursor: not-allowed; opacity: 0.3; }
+            .slot-number {
+                position: absolute; top: 4px; left: 6px; font-size: 10px;
+                color: #71717a; font-family: monospace; font-weight: bold;
+            }
+            .drone-svg { width: 55%; height: 55%; color: #a1a1aa; }
+            .drone-slot.selected .drone-svg { color: #facc15; }
+            .drone-slot:hover:not(.empty):not(.selected) .drone-svg { color: #d8b4fe; }
+            .intercept-modal .modal-footer {
+                padding: 16px 20px; border-top: 1px solid #3f3f46;
+                display: flex; justify-content: space-between; align-items: center;
+            }
+            .launch-btn {
+                background: #dc2626; color: white; border: 1px solid #ef4444;
+                padding: 10px 20px; font-weight: bold; font-family: monospace; letter-spacing: 1.5px;
+                border-radius: 4px; cursor: pointer; transition: 0.2s; font-size: 14px;
+            }
+            .launch-btn:hover:not(:disabled) { background: #b91c1c; box-shadow: 0 0 15px rgba(220, 38, 38, 0.6); }
+            .launch-btn:disabled { background: #3f3f46; border-color: #52525b; color: #71717a; cursor: not-allowed; }
+        `;
+        document.head.appendChild(style);
+
+        // --- 2. Inject HTML ---
+        overlay = document.createElement('div');
+        overlay.id = 'intercept-modal-overlay';
+        overlay.className = 'hidden';
+        overlay.innerHTML = `
+            <div class="intercept-modal">
+                <div class="modal-header">
+                    <span>TACTICAL DRONE LAUNCHER // 16-CELL</span>
+                    <button class="close-btn" id="close-intercept-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="launcher-grid" id="launcher-grid"></div>
+                </div>
+                <div class="modal-footer">
+                    <span id="selected-drone-status" style="flex-grow: 1; font-family: monospace; font-size: 13px; color: #a1a1aa;">AWAITING SELECTION...</span>
+                    <button id="btn-launch-drone" class="launch-btn" disabled>LAUNCH</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        // Close events
+        document.getElementById('close-intercept-modal').onclick = () => overlay.classList.add('hidden');
+        overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.add('hidden'); };
+    }
+
+    // --- 3. Populate / Reset Grid Logic ---
+    const grid = document.getElementById('launcher-grid');
+    grid.innerHTML = ''; // Clear previous
+    let selectedSlot = null;
+    const launchBtn = document.getElementById('btn-launch-drone');
+    const statusText = document.getElementById('selected-drone-status');
+    
+    launchBtn.disabled = true;
+    statusText.innerText = `TARGET: TRACK-${targetId} | SELECT TUBE`;
+
+    // SVG mimicking the white-domed quadcopters in the reference images
+    const droneSvg = `
+        <svg class="drone-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M19.07 19.07l-2.83-2.83"/><path d="M2 12h4"/><path d="M22 12h-4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M19.07 4.93l-2.83 2.83"/>
+            <!-- White Dome -->
+            <circle cx="12" cy="12" r="4" fill="#ffffff" stroke="none"/> 
+            <circle cx="12" cy="12" r="4" stroke="currentColor"/>
+        </svg>`;
+
+    // Generate the 16 slots
+    for (let i = 1; i <= 16; i++) {
+        const slot = document.createElement('div');
+        
+        // CHECK GLOBAL STATE: Is this tube marked as empty?
+        const isEmpty = emptyTubes.has(i);
+        
+        slot.className = `drone-slot ${isEmpty ? 'empty' : 'ready'}`;
+        slot.innerHTML = `
+            <span class="slot-number">T${i.toString().padStart(2, '0')}</span>
+            ${isEmpty ? '' : droneSvg}
+        `;
+        
+        if (!isEmpty) {
+            slot.onclick = () => {
+                const prev = grid.querySelector('.selected');
+                if (prev) prev.classList.remove('selected');
+                
+                slot.classList.add('selected');
+                selectedSlot = i;
+                launchBtn.disabled = false;
+                statusText.innerHTML = `TARGET: TRACK-${targetId} | <span style="color:#facc15;">TUBE ${i.toString().padStart(2, '0')} READY</span>`;
+            };
+        }
+        grid.appendChild(slot);
+    }
+
+    // --- 4. Launch Action ---
+    launchBtn.onclick = () => {
+        if (selectedSlot) {
+            // NEW: Mark the chosen tube as permanently empty!
+            emptyTubes.add(selectedSlot);
+            
+            overlay.classList.add('hidden');
+        }
+    };
+
+    // Show the modal
+    overlay.classList.remove('hidden');
+}
+
+
+// =====================================================================
 // UTILITY FUNCTIONS
 // =====================================================================
 
 function clearSelectedTarget() {
     currentSelectedTrackId = null;
-    window.selectedTargetId = null;
-    clearRawJsonDisplay();
     const emptyMsg = document.getElementById('empty-target-msg');
     const jsonCard = document.getElementById('target-json-card');
     
@@ -343,8 +507,6 @@ function clearSelectedTarget() {
         cesiumViewer.trackedEntity = undefined;
         cesiumViewer.camera.cancelFlight();
     }
-
-    closeTrackPopup();
 }
 
 function updateCardLiveValues(trackJson) {
@@ -398,9 +560,18 @@ function createButton(label, svgIcon, baseBg, hoverBg, borderColor) {
     btn.style.borderRadius = '4px';
     btn.style.transition = 'background 0.2s';
 
-    btn.innerHTML = `${svgIcon} <span style="white-space: nowrap;">${label}</span>`;
-    btn.onmouseenter = () => btn.style.background = hoverBg;
-    btn.onmouseleave = () => btn.style.background = baseBg;
+    // We add the text inside a dedicated span that is hidden by default
+    btn.innerHTML = `${svgIcon} <span class="btn-label" style="display: none; white-space: nowrap;">${label}</span>`;
+    
+    // Toggle the display of the span on hover
+    btn.onmouseenter = () => {
+        btn.style.background = hoverBg;
+        btn.querySelector('.btn-label').style.display = 'inline';
+    };
+    btn.onmouseleave = () => {
+        btn.style.background = baseBg;
+        btn.querySelector('.btn-label').style.display = 'none';
+    };
     return btn;
 }
 

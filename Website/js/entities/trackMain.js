@@ -6,7 +6,9 @@ import { spawnVelocityArrow, updateVelocityArrow } from './trackVelocity.js';
 import { startCleanupTimer } from './trackLifecycle.js';
 import { getClassColor, getClassSymbol, formatAltitude } from './trackVisuals.js';
 import { getPredictionPositions } from './trackGeometry.js';
+import { isLiteModeActive } from '../core/settings.js';
 import { feedPopupData } from './trackPopup.js';
+import { connectTracker, connectVideo } from '../data/DataLink.js';
 
 // ===================== ENTITY BUILDERS =====================
 
@@ -87,16 +89,29 @@ export function updateMainTrack(ctx) {
     entity.lastSeen = Date.now();
 }
 
-// ===================== ORCHESTRATION (formerly TrackerMarkers.js) =====================
+// ===================== ORCHESTRATION =====================
 
 const trackEntities = {};
 const historyEntities = {};
 const predictionEntities = {};
-const MAX_HISTORY_POINTS = 40;
+const MAX_HISTORY_POINTS_NORMAL = 40;
+const MAX_HISTORY_POINTS_LITE = 15;
 const GLIDE_DURATION = 1000;
 const arrowEntities = {};
 
 startCleanupTimer(trackEntities, predictionEntities, historyEntities, arrowEntities);
+
+// =========================================================================
+// MENGAKTIFKAN TELINGA UNTUK MENERIMA PERINTAH DISPATCH DARI RDF
+// =========================================================================
+// listenForOptronicDispatch((targetData) => {
+//     // Ini hanya contoh visual, memunculkan pop-up di layar Optronic
+//     alert(`⚡ PERINTAH TAKTIS MASUK!\nSegera arahkan Optronic ke Sudut: ${targetData.bearing}°\nFrekuensi: ${targetData.freq} MHz`);
+    
+//     // Nanti di sinilah kita letakkan perintah pergerakan motor kamera Anda
+//     console.log(">> Data Target Siap Dieksekusi oleh PTZ:", targetData);
+// });
+// =========================================================================
 
 export function updateCesiumMarkers(activeTracks) {
     if (!cesiumViewer) return;
@@ -122,15 +137,17 @@ export function updateCesiumMarkers(activeTracks) {
         const predPositions = getPredictionPositions(airPosition, geo.lat, geo.lon, predictions, altMeters);
 
         // Package all necessary dependencies into a single context object
+        const MAX_HISTORY_POINTS = isLiteModeActive() ? MAX_HISTORY_POINTS_LITE : MAX_HISTORY_POINTS_NORMAL;
+
         const ctx = {
             id, airPosition, groundPosition, altMeters, classification, color, predPositions,
-            speedMs, headingDeg, // <-- NEW: Pass kinematic data to context
-            cesiumViewer, trackEntities, predictionEntities, historyEntities, arrowEntities, // <-- NEW: Pass dictionary
+            speedMs, headingDeg, 
+            cesiumViewer, trackEntities, predictionEntities, historyEntities, arrowEntities, 
             GLIDE_DURATION, MAX_HISTORY_POINTS, getClassSymbol, formatAltitude
         };
 
         feedPopupData(id, track);
-        
+
         if (!trackEntities[id]) {
             spawnMainTrack(ctx);
             spawnPredictionLine(ctx); 

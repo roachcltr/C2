@@ -55,7 +55,7 @@ int main() {
     // --- 2. SETUP RADAR INGEST (Background Thread) ---
     auto *loop = uWS::Loop::get();
     std::thread udp_thread([&app, loop, RADAR_PORT]() {
-        ThreatAnalyzer engine(-7.749786, 108.502177);
+        ThreatAnalyzer engine(-6.950689, 107.619899);
         int radar_sock = socket(AF_INET, SOCK_DGRAM, 0);
         if (radar_sock < 0) {
             std::cerr << "[!] Failed to create radar socket\n";

@@ -15,6 +15,17 @@ export function getClassColor(classification) {
     return Cesium.Color.YELLOW; // UNKNOWN_NO_DATA / anything unrecognized
 }
 
+// Sama seperti getClassColor() tapi hex string biasa - dipakai oleh Lite Mode
+// (Leaflet) yang tidak punya objek Cesium.Color. Warna disamakan dengan legend
+// di index.html (shape & base color).
+export function getClassColorHex(classification) {
+    if (classification.includes("FIXED_WING_HEAVY")) return "#3b82f6";
+    if (classification.includes("HIGH_SPEED_TACTICAL")) return "#ef4444";
+    if (classification.includes("UAV")) return "#f97316";
+    if (classification.includes("BOGEY")) return "#eab308";
+    return "#eab308";
+}
+
 function getEvasiveBadge() {
     // 1. Circle 'cx' moved from 30 to 100 to clear the text width.
     // 2. Icon translation X moved from 21 to 91 to stay centered (100 - 9 = 91).

@@ -1,16 +1,21 @@
 // js/app.js
 import { connectTracker, connectVideo } from './data/DataLink.js';
-import { initMap } from './core/Map.js';
+import { loadMapEngine } from './core/mapLoader.js';
 import { handleIncomingTrack } from './data/TrackHandler.js';
 // import { initVideoOverlay, handleIncomingSweep } from './overlay/VideoOverlay.js';
-import { initUI } from './ui/UI.js';
+import { initUI, initMapDependentUI } from './ui/UI.js';
+import { getLiteModePreference, applyLiteModeClass, getRadarModePreference, applyRadarModeClass } from './core/settings.js';
 
-initMap().then(() => {
-    // Data Link Connections
-    connectTracker(handleIncomingTrack);
-    // connectVideo(handleIncomingSweep);
+applyLiteModeClass(getLiteModePreference());
+applyRadarModeClass(getRadarModePreference());
 
-    // Initializations
+initUI();
+connectTracker(handleIncomingTrack);
+// connectVideo(handleIncomingSweep);
+
+loadMapEngine().then(() => {
+    initMapDependentUI();
     // initVideoOverlay();
-    initUI();
+}).catch((err) => {
+    console.error('[MAP] Gagal inisialisasi peta:', err);
 });

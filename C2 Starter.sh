@@ -35,7 +35,7 @@ tmux split-window -v "echo '=== KAMIKAZE TMMR ==='; $HOME/C2/TMMR/kamikaze"
 
 # 6. Select the first pane again, split it vertically for Video Node
 tmux select-pane -t 0
-tmux split-window -v "echo '=== OPTRONIC VIDEO ==='; python3 $HOME/C2/Server/Optronic/video.py"
+#tmux split-window -v "echo '=== OPTRONIC VIDEO ==='; python3 $HOME/C2/Server/Optronic/video.py"
 
 # 7. Split the Video pane vertically for the Control Node
 tmux split-window -v "echo '=== OPTRONIC CONTROL ==='; python3 $HOME/C2/Server/Optronic/control.py"

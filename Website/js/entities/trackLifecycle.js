@@ -1,5 +1,6 @@
 // js/entities/trackLifecycle.js
 import { cesiumViewer } from '../core/Map.js';
+import { isLiteModeActive } from '../core/settings.js';
 
 const TRACK_TIMEOUT = 5000;
 let cleanupStarted = false;
@@ -34,5 +35,7 @@ export function startCleanupTimer(trackEntities, predictionEntities, historyEnti
     if (cleanupStarted) return;
     cleanupStarted = true;
 
-    setInterval(() => cleanupStaleTracks(trackEntities, predictionEntities, historyEntities), 500); // Check twice per second
+    // Lite Mode: cek lebih jarang untuk kurangi beban CPU pada device low-spec.
+    const interval = isLiteModeActive() ? 2000 : 500;
+    setInterval(() => cleanupStaleTracks(trackEntities, predictionEntities, historyEntities), interval);
 }

@@ -2,11 +2,23 @@
    16. CAMERA PANEL & HUD STYLES
    ========================================= */
 
-/* Kembalikan lebar standar, biarkan panel MEMANJANG KE BAWAH */
+/* Use positioning and transform to hide the panel without destroying iframe dimensions */
 #right-camera-panel {
   width: 480px !important;
-  height: auto !important; /* Rahasia agar panel turun mengisi space kosong */
-  max-height: 96vh !important; /* Batas aman agar tidak tembus layar monitor */
+  height: auto !important;
+  max-height: 96vh !important;
+  position: absolute;
+  right: 0;
+  transform: translateX(0);
+  transition: transform 0.3s ease-in-out;
+  z-index: 100;
+  overflow: visible !important;
+}
+
+/* Force the panel off-screen instead of using display: none */
+#right-camera-panel.closed {
+  transform: translateX(100%);
+  /* display: none; <-- DO NOT USE THIS */
 }
 
 .camera-body-wrapper {
@@ -18,24 +30,27 @@
   background: #0a0d12;
 }
 
-/* Video mengambil rasio murni dari backend */
+/* Video mengambil rasio murni 16:9 (1280x720 / 1920x1080) */
 .video-wrapper {
   width: 100%;
-  height: auto; 
+  aspect-ratio: 16 / 9; /* Ini rahasianya agar iframe tidak gepeng */
   background: #000;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   border-bottom: 1px solid var(--panel);
+  overflow: hidden; /* Mencegah scrollbar muncul di dalam panel */
 }
 
 #optronic-stream {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: auto; /* Tinggi otomatis menjaga rasio asli kamera */
-  object-fit: contain; /* Tidak ada zoom/potong paksa */
+  height: 100%; /* Paksa iframe mengisi seluruh wrapper 16:9 */
+  border: none;
   display: block;
-  /* transform: rotate(180deg); */
 }
 
 /* Panel Kontrol di Bawah */
@@ -388,3 +403,175 @@
   color: var(--strokeorborder) !important;
   box-shadow: inset 0 0 8px rgba(74, 222, 128, 0.3);
 }
+
+/* --- AI Target Overlays --- */
+.ai-target-box {
+    position: absolute;
+    border: 2px solid #0f0;
+    box-sizing: border-box;
+    pointer-events: auto; /* Allows the box to be clicked separately from the video */
+    cursor: crosshair;
+    transition: border-color 0.1s, background-color 0.1s;
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.4) inset, 0 0 8px rgba(0, 255, 0, 0.4);
+}
+
+.ai-target-box:hover {
+    border-color: #ff0;
+    background-color: rgba(255, 255, 0, 0.15);
+    box-shadow: 0 0 8px rgba(255, 255, 0, 0.6) inset, 0 0 8px rgba(255, 255, 0, 0.6);
+}
+
+.ai-target-label {
+    position: absolute;
+    top: -22px;
+    left: -2px;
+    background: #0f0;
+    color: #000;
+    font-size: 11px;
+    font-family: monospace;
+    font-weight: bold;
+    padding: 2px 6px;
+    letter-spacing: 1px;
+}
+
+.ai-target-box:hover .ai-target-label {
+    background: #ff0;
+}
+
+/* =========================================
+   SIDEBAR AI TRACKLIST (SLIDE OUT KIRI)
+   ========================================= */
+#tracklist-sidebar {
+    position: absolute;
+    top: 40px; /* Muncul di bawah header kamera */
+    right: 100%; /* Menempel presisi di sisi kiri panel utama */
+    width: 280px;
+    bottom: 0;
+    background: rgba(10, 13, 18, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+    transform: translateX(0); /* Posisi Terbuka (Muncul ke kiri) */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1; /* RAHASIA: Sembunyi tepat di belakang panel kamera */
+    display: flex;
+    flex-direction: column;
+}
+
+#tracklist-sidebar.collapsed {
+    transform: translateX(100%); /* Geser ke kanan (tertelan oleh panel utama) */
+}
+
+/* Tab Toggle Button (Tombol Pelatuk) */
+#tracklist-toggle-btn {
+    position: absolute;
+    top: 45px;
+    left: -28px; /* Menonjol keluar 28px dari sisi kiri kamera */
+    width: 28px;
+    height: 110px;
+    background: rgba(10, 13, 18, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    color: #8ba2b5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: 0.2s;
+    padding: 0;
+    z-index: 10; /* Pastikan tombol selalu di atas sidebar */
+}
+
+#tracklist-toggle-btn:hover {
+    color: var(--strokeorborder);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#tracklist-toggle-btn.active {
+    color: var(--strokeorborder);
+    box-shadow: inset 2px 0 5px rgba(74, 222, 128, 0.2);
+}
+
+/* Teks Vertikal di Tombol */
+#tracklist-toggle-btn .tab-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* Animasi Panah (Chevron) */
+#tracklist-toggle-btn .chevron-icon {
+    transition: transform 0.3s;
+}
+#tracklist-toggle-btn.active .chevron-icon {
+    transform: rotate(180deg); /* Balik arah saat sidebar terbuka */
+}
+
+/* Header & Body Sidebar */
+.sidebar-track-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--strokeorborder);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.track-badge {
+    background: rgba(74, 222, 128, 0.2);
+    color: var(--strokeorborder);
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+}
+.sidebar-track-body {
+    padding: 8px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Penyesuaian Tabel Bersih & Taktis untuk Sidebar */
+.tgt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #fff;
+}
+.tgt-table th {
+    color: #8ba2b5;
+    padding: 6px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: left;
+}
+.tgt-table td {
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    vertical-align: middle;
+}
+.lock-btn {
+    background: transparent;
+    color: var(--strokeorborder);
+    border: 1px solid var(--strokeorborder);
+    font-weight: bold;
+    padding: 3px 6px;
+    cursor: pointer;
+    font-size: 9px;
+    border-radius: 3px;
+    transition: 0.2s;
+}
+.lock-btn:hover { background: var(--strokeorborder); color: #000; }
+
+.camera-panel-header { position: relative; z-index: 5; }
+.camera-body-wrapper { position: relative; z-index: 5; }

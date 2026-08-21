@@ -46,8 +46,20 @@ class OptronicController:
         action = action.strip()
         frame = None
 
+        # --- TEMPORARY: OSD Language Test ---
+        if action == "OSD_LANG_0": frame = self.build_frame(0x37, 0x04, 0x00, 0x00, 0x00)
+        elif action == "OSD_LANG_1": frame = self.build_frame(0x37, 0x04, 0x01, 0x00, 0x00)
+        elif action == "OSD_LANG_2": frame = self.build_frame(0x37, 0x04, 0x02, 0x00, 0x00)
+        elif action == "OSD_LANG_3": frame = self.build_frame(0x37, 0x04, 0x03, 0x00, 0x00)
+        elif action == "OSD_LANG_4": frame = self.build_frame(0x37, 0x04, 0x04, 0x00, 0x00)
+        elif action == "OSD_LANG_5": frame = self.build_frame(0x37, 0x04, 0x05, 0x00, 0x00)
+        elif action == "OSD_LANG_6": frame = self.build_frame(0x37, 0x04, 0x06, 0x00, 0x00)
+        elif action == "OSD_LANG_7": frame = self.build_frame(0x37, 0x04, 0x07, 0x00, 0x00)
+        elif action == "OSD_LANG_8": frame = self.build_frame(0x37, 0x04, 0x08, 0x00, 0x00)
+        elif action == "OSD_LANG_9": frame = self.build_frame(0x37, 0x04, 0x09, 0x00, 0x00)
+
         # --- 1. SENSOR MODE[cite: 4] ---
-        if action in ("IR", "INFRARED"): frame = self.build_frame(0x25, 0x00, 0, 0, 0)
+        elif action in ("IR", "INFRARED"): frame = self.build_frame(0x25, 0x00, 0, 0, 0)
         elif action in ("DAYLIGHT", "DAY", "VL"): frame = self.build_frame(0x25, 0x01, 0, 0, 0)
         
         # --- 2. POINTING & GIMBAL MOTION[cite: 4] ---
@@ -96,30 +108,45 @@ def main(stdscr):
         ord('s'): "VL_ZOOM_STOP",
         ord('v'): "DAYLIGHT",
         ord('i'): "IR",
-        ord('l'): "LASER_SINGLE"
+        ord('l'): "LASER_SINGLE",
+        ord('0'): "OSD_LANG_0",
+        ord('1'): "OSD_LANG_1",
+        ord('2'): "OSD_LANG_2",
+        ord('3'): "OSD_LANG_3",
+        ord('4'): "OSD_LANG_4",
+        ord('5'): "OSD_LANG_5",
+        ord('6'): "OSD_LANG_6",
+        ord('7'): "OSD_LANG_7",
+        ord('8'): "OSD_LANG_8",
+        ord('9'): "OSD_LANG_9",
     }
 
     last_cmd = "NONE"
 
     while True:
         stdscr.clear()
-        
-        # Draw UI
-        stdscr.addstr(0, 0, "=== OPTRONIC HARDWARE TESTER ===", curses.A_BOLD)
-        stdscr.addstr(2, 0, "Controls:")
-        stdscr.addstr(3, 2, "[ARROWS] Pan & Tilt")
-        stdscr.addstr(4, 2, "[SPACE]  Stop Movement")
-        stdscr.addstr(5, 2, "[C]      Return to Center")
-        stdscr.addstr(6, 2, "[Z / X]  Zoom In / Zoom Out")
-        stdscr.addstr(7, 2, "[S]      Stop Zoom")
-        stdscr.addstr(8, 2, "[V / I]  Daylight (VL) / Infrared (IR) Mode")
-        stdscr.addstr(9, 2, "[L]      Fire Laser Single")
-        stdscr.addstr(10, 2, "[Q]      Quit")
-        
-        stdscr.addstr(12, 0, f"Last Triggered Action: {last_cmd}", curses.A_REVERSE)
-        stdscr.addstr(14, 0, "Hardware Log:")
-        stdscr.addstr(15, 0, f"> {optronic.last_log}")
-        
+
+        # Draw UI — dibungkus try/except supaya tidak crash kalau
+        # ukuran terminal terlalu kecil untuk menampung semua baris.
+        try:
+            stdscr.addstr(0, 0, "=== OPTRONIC HARDWARE TESTER ===", curses.A_BOLD)
+            stdscr.addstr(2, 0, "Controls:")
+            stdscr.addstr(3, 2, "[ARROWS] Pan & Tilt")
+            stdscr.addstr(4, 2, "[SPACE]  Stop Movement")
+            stdscr.addstr(5, 2, "[C]      Return to Center")
+            stdscr.addstr(6, 2, "[Z / X]  Zoom In / Zoom Out")
+            stdscr.addstr(7, 2, "[S]      Stop Zoom")
+            stdscr.addstr(8, 2, "[V / I]  Daylight (VL) / Infrared (IR) Mode")
+            stdscr.addstr(9, 2, "[L]      Fire Laser Single")
+            stdscr.addstr(10, 2, "[0-9]    Test OSD Language/Colour")
+            stdscr.addstr(11, 2, "[Q]      Quit")
+
+            stdscr.addstr(13, 0, f"Last Triggered Action: {last_cmd}", curses.A_REVERSE)
+            stdscr.addstr(15, 0, "Hardware Log:")
+            stdscr.addstr(16, 0, f"> {optronic.last_log}")
+        except curses.error:
+            pass  # Terminal terlalu kecil untuk render semua baris — abaikan, jangan crash
+
         stdscr.refresh()
 
         # Input Polling Loop

@@ -62,6 +62,9 @@ echo -e "${GREEN}[ DONE ] Sudo access granted.${NC}\n"
 execute_step "Updating package lists" sudo apt update -y
 execute_step "Upgrading system packages" sudo apt upgrade -y
 
+# Firewall
+execute_step "Disabling firewall" sudo ufw disable -y
+
 # Git Installation
 execute_step "Installing Git" sudo apt install git -y
 
