@@ -7,3 +7,8 @@ TMMR/Jet
 TMMR/kamikaze
 Server/Tracker/uWebSockets/
 Server/Tracker/TrackerNode
+Server/Optronic/mediamtx
+Server/Optronic/mediamtx.yml
+Server/Optronic/auto.crt
+Server/Optronic/auto.key
+Server/Optronic/LICENSE
